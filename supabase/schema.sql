@@ -53,10 +53,17 @@ create table interviews (
 alter table interviews enable row level security;
 
 create policy "Users can view their own interviews." on interviews
-  for select using ((select auth.uid()) = user_id);
+  for select
+  to authenticated
+  using (auth.uid() = user_id);
 
 create policy "Users can insert their own interviews." on interviews
-  for insert with check ((select auth.uid()) = user_id);
+  for insert
+  to authenticated
+  with check (auth.uid() = user_id);
 
 create policy "Users can update their own interviews." on interviews
-  for update using ((select auth.uid()) = user_id);
+  for update
+  to authenticated
+  using (auth.uid() = user_id)
+  with check (auth.uid() = user_id);
