@@ -35,7 +35,8 @@ export async function startInterview(formData: FormData) {
 
   if (error || !data) {
     console.error('Failed to create interview:', error)
-    redirect('/error')
+    const errorMessage = error?.message || 'An unexpected error occurred while creating the interview.'
+    redirect(`/dashboard/interview/setup?error=${encodeURIComponent(errorMessage)}`)
   }
 
   // Redirect to the interview session page
