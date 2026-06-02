@@ -36,3 +36,27 @@ $$ language plpgsql security definer;
 create trigger on_auth_user_created
   after insert on auth.users
   for each row execute procedure public.handle_new_user();
+
+
+-- Create table for interviews
+create table interviews (
+  id uuid default gen_random_uuid() primary key,
+  user_id uuid references auth.users not null,
+  job_title text not null,
+  experience_level text not null,
+  interview_type text not null,
+  status text default 'setup' not null,
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+-- Set up RLS for interviews
+alter table interviews enable row level security;
+
+create policy "Users can view their own interviews." on interviews
+  for select using ((select auth.uid()) = user_id);
+
+create policy "Users can insert their own interviews." on interviews
+  for insert with check ((select auth.uid()) = user_id);
+
+create policy "Users can update their own interviews." on interviews
+  for update using ((select auth.uid()) = user_id);
