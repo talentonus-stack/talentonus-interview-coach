@@ -41,7 +41,7 @@ export default async function DashboardPage() {
         <div className="max-w-4xl mx-auto">
           <header className="mb-8">
             <h1 className="text-3xl font-bold text-gray-900">
-              Welcome to Talentonus Interview Coach
+              Talentonus Interview Coach Dashboard
             </h1>
           </header>
 
