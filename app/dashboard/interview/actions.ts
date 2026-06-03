@@ -14,11 +14,13 @@ export async function startInterview(formData: FormData) {
   }
 
   // Parse form data
+  const industry = formData.get('industry') as string
+  const department = formData.get('department') as string
   const jobTitle = formData.get('jobTitle') as string
   const experienceLevel = formData.get('experienceLevel') as string
   const interviewType = formData.get('interviewType') as string
   const difficultyLevel = formData.get('difficultyLevel') as string || 'Medium'
-  const questionCount = parseInt(formData.get('questionCount') as string || '5', 10)
+  const questionCount = parseInt(formData.get('questionCount') as string || '10', 10)
   const durationMinutes = parseInt(formData.get('durationMinutes') as string || '30', 10)
 
   // Parse skills
@@ -52,6 +54,8 @@ export async function startInterview(formData: FormData) {
     .insert([
       {
         user_id: user.id,
+        industry: industry,
+        department: department,
         job_title: jobTitle,
         experience_level: experienceLevel,
         interview_type: interviewType,

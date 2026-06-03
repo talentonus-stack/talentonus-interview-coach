@@ -1,18 +1,36 @@
 'use client'
 
-import { useState } from 'react'
-
-const AVAILABLE_SKILLS = [
-  'PHP', 'Laravel', 'MySQL', 'JavaScript', 'React', 'Node.js', 'Python', 'HR Recruitment', 'Sales'
-]
+import { useState, useMemo } from 'react'
+import { INDUSTRIES, DEPARTMENTS_BY_INDUSTRY, SKILLS_BY_DEPARTMENT } from './constants'
 
 export default function SetupForm({
   action,
 }: {
   action: (payload: FormData) => void
 }) {
+  const [selectedIndustry, setSelectedIndustry] = useState<string>('')
+  const [selectedDepartment, setSelectedDepartment] = useState<string>('')
   const [selectedSkills, setSelectedSkills] = useState<string[]>([])
   const [isSubmitting, setIsSubmitting] = useState(false)
+
+  const availableDepartments = useMemo(() => {
+    return selectedIndustry ? DEPARTMENTS_BY_INDUSTRY[selectedIndustry] || [] : []
+  }, [selectedIndustry])
+
+  const availableSkills = useMemo(() => {
+    return selectedDepartment ? SKILLS_BY_DEPARTMENT[selectedDepartment] || [] : []
+  }, [selectedDepartment])
+
+  const handleIndustryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedIndustry(e.target.value)
+    setSelectedDepartment('')
+    setSelectedSkills([])
+  }
+
+  const handleDepartmentChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedDepartment(e.target.value)
+    setSelectedSkills([])
+  }
 
   const toggleSkill = (skill: string) => {
     setSelectedSkills(prev =>
@@ -30,6 +48,47 @@ export default function SetupForm({
 
   return (
     <form action={action} onSubmit={handleSubmit} className="space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="industry">
+            Industry
+          </label>
+          <select
+            className="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+            id="industry"
+            name="industry"
+            value={selectedIndustry}
+            onChange={handleIndustryChange}
+            required
+          >
+            <option value="" disabled>Select industry...</option>
+            {INDUSTRIES.map(ind => (
+              <option key={ind} value={ind}>{ind}</option>
+            ))}
+          </select>
+        </div>
+
+        <div>
+          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="department">
+            Department
+          </label>
+          <select
+            className="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white disabled:bg-gray-100"
+            id="department"
+            name="department"
+            value={selectedDepartment}
+            onChange={handleDepartmentChange}
+            required
+            disabled={!selectedIndustry || availableDepartments.length === 0}
+          >
+            <option value="" disabled>Select department...</option>
+            {availableDepartments.map(dept => (
+              <option key={dept} value={dept}>{dept}</option>
+            ))}
+          </select>
+        </div>
+      </div>
+
       <div>
         <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="jobTitle">
           Job Title
@@ -83,28 +142,30 @@ export default function SetupForm({
         </div>
       </div>
 
-      <div>
-        <label className="block text-gray-700 text-sm font-bold mb-2">
-          Skills
-        </label>
-        <div className="flex flex-wrap gap-2">
-          {AVAILABLE_SKILLS.map(skill => (
-            <button
-              key={skill}
-              type="button"
-              onClick={() => toggleSkill(skill)}
-              className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
-                selectedSkills.includes(skill)
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-              }`}
-            >
-              {skill}
-            </button>
-          ))}
+      {selectedDepartment && availableSkills.length > 0 && (
+        <div>
+          <label className="block text-gray-700 text-sm font-bold mb-2">
+            Skills
+          </label>
+          <div className="flex flex-wrap gap-2">
+            {availableSkills.map(skill => (
+              <button
+                key={skill}
+                type="button"
+                onClick={() => toggleSkill(skill)}
+                className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                  selectedSkills.includes(skill)
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                }`}
+              >
+                {skill}
+              </button>
+            ))}
+          </div>
+          <input type="hidden" name="skills" value={JSON.stringify(selectedSkills)} />
         </div>
-        <input type="hidden" name="skills" value={JSON.stringify(selectedSkills)} />
-      </div>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div>
@@ -132,12 +193,12 @@ export default function SetupForm({
             className="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
             id="questionCount"
             name="questionCount"
-            defaultValue="5"
+            defaultValue="10"
             required
           >
-            <option value="5">5 Questions</option>
             <option value="10">10 Questions</option>
             <option value="20">20 Questions</option>
+            <option value="50">50 Questions</option>
           </select>
         </div>
 
@@ -177,9 +238,9 @@ export default function SetupForm({
       <div className="flex items-center justify-end mt-8">
         <button
           type="submit"
-          disabled={isSubmitting || selectedSkills.length === 0}
+          disabled={isSubmitting || (availableSkills.length > 0 && selectedSkills.length === 0)}
           className={`font-bold py-3 px-6 rounded-lg focus:outline-none focus:shadow-outline transition duration-150 ease-in-out w-full sm:w-auto ${
-            isSubmitting || selectedSkills.length === 0
+            isSubmitting || (availableSkills.length > 0 && selectedSkills.length === 0)
               ? 'bg-blue-400 cursor-not-allowed text-white'
               : 'bg-blue-600 hover:bg-blue-700 text-white'
           }`}
@@ -187,8 +248,8 @@ export default function SetupForm({
           {isSubmitting ? 'Starting...' : 'Start Interview'}
         </button>
       </div>
-      {selectedSkills.length === 0 && !isSubmitting && (
-        <p className="text-red-500 text-sm text-right mt-2">Please select at least one skill.</p>
+      {availableSkills.length > 0 && selectedSkills.length === 0 && !isSubmitting && (
+        <p className="text-red-500 text-sm text-right mt-2">Please select at least one skill from the available options.</p>
       )}
     </form>
   )

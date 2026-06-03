@@ -47,9 +47,11 @@ create table interviews (
   interview_type text not null,
   status text default 'setup' not null,
   created_at timestamp with time zone default timezone('utc'::text, now()) not null,
+  industry text,
+  department text,
   skills text[] default '{}',
   difficulty_level text default 'Medium',
-  question_count integer default 5,
+  question_count integer default 10,
   duration_minutes integer default 30,
   resume_url text
 );

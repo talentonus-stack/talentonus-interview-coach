@@ -45,6 +45,12 @@ export default async function InterviewSessionPage({ params }: { params: Promise
         <h2 className="text-xl font-semibold mb-4 text-gray-800">Interview Details</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
+            <span className="block text-sm font-medium text-gray-500">Industry & Department</span>
+            <span className="block mt-1 text-lg text-gray-900">
+              {interview.industry || 'N/A'} • {interview.department || 'N/A'}
+            </span>
+          </div>
+          <div>
             <span className="block text-sm font-medium text-gray-500">Job Title</span>
             <span className="block mt-1 text-lg text-gray-900">{interview.job_title}</span>
           </div>
