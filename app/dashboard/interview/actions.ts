@@ -17,6 +17,34 @@ export async function startInterview(formData: FormData) {
   const jobTitle = formData.get('jobTitle') as string
   const experienceLevel = formData.get('experienceLevel') as string
   const interviewType = formData.get('interviewType') as string
+  const difficultyLevel = formData.get('difficultyLevel') as string || 'Medium'
+  const questionCount = parseInt(formData.get('questionCount') as string || '5', 10)
+  const durationMinutes = parseInt(formData.get('durationMinutes') as string || '30', 10)
+
+  // Parse skills
+  const skillsStr = formData.get('skills') as string
+  const skills = skillsStr ? JSON.parse(skillsStr) : []
+
+  // Handle optional resume upload
+  let resumeUrl = null
+  const resumeFile = formData.get('resume') as File
+
+  if (resumeFile && resumeFile.size > 0) {
+    const fileExt = resumeFile.name.split('.').pop()
+    const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`
+    const filePath = `${user.id}/${fileName}`
+
+    const { error: uploadError } = await supabase.storage
+      .from('resumes')
+      .upload(filePath, resumeFile)
+
+    if (uploadError) {
+      console.error('Failed to upload resume:', uploadError)
+      redirect(`/dashboard/interview/setup?error=${encodeURIComponent('Failed to upload resume.')}`)
+    }
+
+    resumeUrl = filePath
+  }
 
   // Insert into Supabase 'interviews' table
   const { data, error } = await supabase
@@ -27,6 +55,11 @@ export async function startInterview(formData: FormData) {
         job_title: jobTitle,
         experience_level: experienceLevel,
         interview_type: interviewType,
+        difficulty_level: difficultyLevel,
+        question_count: questionCount,
+        duration_minutes: durationMinutes,
+        skills: skills,
+        resume_url: resumeUrl,
         status: 'setup',
       },
     ])

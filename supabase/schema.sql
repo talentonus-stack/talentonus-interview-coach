@@ -46,7 +46,12 @@ create table interviews (
   experience_level text not null,
   interview_type text not null,
   status text default 'setup' not null,
-  created_at timestamp with time zone default timezone('utc'::text, now()) not null
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null,
+  skills text[] default '{}',
+  difficulty_level text default 'Medium',
+  question_count integer default 5,
+  duration_minutes integer default 30,
+  resume_url text
 );
 
 -- Set up RLS for interviews

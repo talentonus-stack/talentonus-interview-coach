@@ -57,6 +57,26 @@ export default async function InterviewSessionPage({ params }: { params: Promise
             <span className="block mt-1 text-lg text-gray-900">{interview.interview_type}</span>
           </div>
           <div>
+            <span className="block text-sm font-medium text-gray-500">Difficulty Level</span>
+            <span className="block mt-1 text-lg text-gray-900">{interview.difficulty_level}</span>
+          </div>
+          <div>
+            <span className="block text-sm font-medium text-gray-500">Duration & Questions</span>
+            <span className="block mt-1 text-lg text-gray-900">
+              {interview.duration_minutes} mins / {interview.question_count} Qs
+            </span>
+          </div>
+          <div>
+            <span className="block text-sm font-medium text-gray-500">Skills</span>
+            <div className="mt-1 flex flex-wrap gap-2">
+              {interview.skills?.map((skill: string) => (
+                <span key={skill} className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                  {skill}
+                </span>
+              ))}
+            </div>
+          </div>
+          <div>
             <span className="block text-sm font-medium text-gray-500">Status</span>
             <span className="inline-flex mt-1 items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 capitalize">
               {interview.status}
