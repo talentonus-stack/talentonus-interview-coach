@@ -1,16 +1,12 @@
 export const INDUSTRIES = [
   'Information Technology',
   'Healthcare',
-  'Finance & Accounting',
-  'Sales & Marketing',
-  'Human Resources',
-  'Manufacturing',
-  'Education',
+  'Finance & Financial Services',
+  'Manufacturing & Heavy Industry',
+  'Education & EdTech',
   'Retail & E-Commerce',
   'Logistics & Supply Chain',
-  'Customer Support',
-  'Banking',
-  'Construction'
+  'Construction & Real Estate'
 ]
 
 export const DEPARTMENTS_BY_INDUSTRY: Record<string, string[]> = {
@@ -24,33 +20,63 @@ export const DEPARTMENTS_BY_INDUSTRY: Record<string, string[]> = {
     'IT Support',
     'Product Management',
     'Sales & Marketing',
-    'HR'
+    'Human Resources',
+    'Customer Support'
   ],
-  'Sales & Marketing': [
-    'Sales',
-    'Digital Marketing',
-    'Performance Marketing',
-    'SEO',
-    'Content Marketing',
-    'Business Development'
+  'Healthcare': [
+    'Medical Staff',
+    'Administration',
+    'Healthcare IT',
+    'Human Resources',
+    'Customer Support'
   ],
-  'Human Resources': [
-    'Recruitment',
-    'Talent Acquisition',
-    'HR Operations',
-    'Payroll',
-    'Learning & Development'
+  'Finance & Financial Services': [
+    'Accounting',
+    'Investment Banking',
+    'Risk Management',
+    'Sales & Marketing',
+    'Human Resources',
+    'Customer Support'
   ],
-  // Fallback for others to avoid empty states
-  'Healthcare': ['Nursing', 'Doctors', 'Administration'],
-  'Finance & Accounting': ['Accounting', 'Financial Planning', 'Auditing'],
-  'Manufacturing': ['Production', 'Quality Control', 'Maintenance'],
-  'Education': ['Teaching', 'Administration', 'Counseling'],
-  'Retail & E-Commerce': ['Store Operations', 'Merchandising', 'Customer Service'],
-  'Logistics & Supply Chain': ['Warehouse Management', 'Transportation', 'Procurement'],
-  'Customer Support': ['Technical Support', 'Client Success', 'Call Center'],
-  'Banking': ['Retail Banking', 'Investment Banking', 'Risk Management'],
-  'Construction': ['Project Management', 'Engineering', 'Safety']
+  'Manufacturing & Heavy Industry': [
+    'Production',
+    'Quality Control',
+    'Maintenance',
+    'Supply Chain',
+    'Human Resources',
+    'Sales & Marketing'
+  ],
+  'Education & EdTech': [
+    'Teaching & Instruction',
+    'Administration',
+    'Counseling',
+    'Sales & Marketing',
+    'Human Resources',
+    'Customer Support'
+  ],
+  'Retail & E-Commerce': [
+    'Store Operations',
+    'Merchandising',
+    'E-Commerce Tech',
+    'Sales & Marketing',
+    'Human Resources',
+    'Customer Support'
+  ],
+  'Logistics & Supply Chain': [
+    'Warehouse Management',
+    'Transportation',
+    'Procurement',
+    'Sales & Marketing',
+    'Human Resources',
+    'Customer Support'
+  ],
+  'Construction & Real Estate': [
+    'Project Management',
+    'Engineering',
+    'Safety',
+    'Sales & Marketing',
+    'Human Resources'
+  ]
 }
 
 export const SKILLS_BY_DEPARTMENT: Record<string, string[]> = {
@@ -67,18 +93,19 @@ export const SKILLS_BY_DEPARTMENT: Record<string, string[]> = {
   'UI/UX Design': [
     'Figma', 'Adobe XD', 'Photoshop', 'Illustrator', 'Wireframing', 'Prototyping'
   ],
-  'Recruitment': [
-    'Sourcing', 'Boolean Search', 'LinkedIn Recruiting', 'Screening',
-    'Interview Coordination', 'ATS Management'
+  'Human Resources': [
+    'Recruitment', 'Talent Acquisition', 'Sourcing', 'Boolean Search',
+    'LinkedIn Recruiting', 'Screening', 'Interview Coordination', 'ATS Management',
+    'Onboarding', 'Employee Relations', 'Compliance', 'Benefits Administration',
+    'HR Operations', 'Payroll', 'Learning & Development'
   ],
-  'Sales': [
-    'B2B Sales', 'Cold Calling', 'Negotiation', 'CRM Management', 'Lead Generation'
+  'Sales & Marketing': [
+    'B2B Sales', 'Cold Calling', 'Negotiation', 'CRM Management', 'Lead Generation',
+    'SEO', 'SEM', 'Social Media Marketing', 'Google Ads', 'Analytics',
+    'Digital Marketing', 'Performance Marketing', 'Content Marketing', 'Business Development'
   ],
-  'Digital Marketing': [
-    'SEO', 'SEM', 'Social Media Marketing', 'Google Ads', 'Analytics'
-  ],
-  'HR Operations': [
-    'Onboarding', 'Employee Relations', 'Compliance', 'Benefits Administration'
+  'Customer Support': [
+    'Technical Support', 'Client Success', 'Call Center', 'Ticketing Systems', 'Zendesk', 'Intercom'
   ],
   'Data Science': [
     'Machine Learning', 'Data Visualization', 'Pandas', 'TensorFlow', 'SQL', 'R'

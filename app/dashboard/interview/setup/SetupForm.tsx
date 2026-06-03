@@ -135,9 +135,19 @@ export default function SetupForm({
             required
           >
             <option value="" disabled>Select interview type...</option>
-            <option value="HR">HR</option>
-            <option value="Technical">Technical</option>
-            <option value="Managerial">Managerial</option>
+            <option value="HR Interview">HR Interview</option>
+            <option value="Technical Interview">Technical Interview</option>
+            <option value="Managerial Interview">Managerial Interview</option>
+            <option value="Behavioral Interview">Behavioral Interview</option>
+            <option value="Situational Interview">Situational Interview</option>
+            <option value="Communication Assessment">Communication Assessment</option>
+            <option value="Leadership Interview">Leadership Interview</option>
+            <option value="Problem Solving Interview">Problem Solving Interview</option>
+            <option value="Client Facing Interview">Client Facing Interview</option>
+            <option value="Sales Interview">Sales Interview</option>
+            <option value="Customer Support Interview">Customer Support Interview</option>
+            <option value="Final Round Interview">Final Round Interview</option>
+            <option value="Mock Interview">Mock Interview</option>
           </select>
         </div>
       </div>

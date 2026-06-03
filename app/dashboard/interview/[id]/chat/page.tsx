@@ -59,8 +59,8 @@ export default async function InterviewChatPage({
 
   // Determine questions based on type
   let questions = dummyTechnicalQuestions
-  if (interview.interview_type === 'HR') questions = dummyHRQuestions
-  if (interview.interview_type === 'Managerial') questions = dummyManagerialQuestions
+  if (interview.interview_type === 'HR Interview') questions = dummyHRQuestions
+  if (interview.interview_type === 'Managerial Interview') questions = dummyManagerialQuestions
 
   return (
     <div className="max-w-4xl mx-auto h-full flex flex-col">
