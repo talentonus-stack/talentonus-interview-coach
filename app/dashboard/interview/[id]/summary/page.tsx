@@ -34,8 +34,7 @@ export default async function InterviewSummaryPage({
     .eq('interview_id', resolvedParams.id)
 
   const answeredCount = count || 0
-  // Since we use 5 dummy questions based on our implementation
-  const totalQuestions = 5
+  const totalQuestions = interview.question_count || 10
 
   return (
     <div className="max-w-4xl mx-auto">

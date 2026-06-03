@@ -58,9 +58,19 @@ export default async function InterviewChatPage({
   }
 
   // Determine questions based on type
-  let questions = dummyTechnicalQuestions
-  if (interview.interview_type === 'HR Interview') questions = dummyHRQuestions
-  if (interview.interview_type === 'Managerial Interview') questions = dummyManagerialQuestions
+  let baseQuestions = dummyTechnicalQuestions
+  if (interview.interview_type === 'HR Interview') baseQuestions = dummyHRQuestions
+  if (interview.interview_type === 'Managerial Interview') baseQuestions = dummyManagerialQuestions
+
+  // Generate the required number of questions by looping over the base questions
+  const requiredCount = interview.question_count || 10
+  const questions: string[] = []
+  for (let i = 0; i < requiredCount; i++) {
+    const questionText = baseQuestions[i % baseQuestions.length]
+    // Add a differentiator to repeated questions for clarity in dummy data
+    const suffix = i >= baseQuestions.length ? ` (Variation ${Math.floor(i / baseQuestions.length) + 1})` : ''
+    questions.push(`${questionText}${suffix}`)
+  }
 
   return (
     <div className="max-w-4xl mx-auto h-full flex flex-col">
