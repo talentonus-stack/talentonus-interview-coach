@@ -1,4 +1,5 @@
 import { redirect } from 'next/navigation'
+import Link from 'next/link'
 import { createClient } from '@/utils/supabase/server'
 
 export default async function InterviewSessionPage({ params }: { params: Promise<{ id: string }> }) {
@@ -67,13 +68,14 @@ export default async function InterviewSessionPage({ params }: { params: Promise
       <div className="bg-gray-50 border border-gray-200 rounded-lg p-12 text-center">
         <h3 className="text-lg font-medium text-gray-900 mb-2">Ready to begin?</h3>
         <p className="text-gray-600 mb-6">
-          The actual interview chat and voice features will be integrated here.
+          Ensure you are in a quiet environment and ready to answer the questions.
         </p>
-        <button
-          className="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-lg focus:outline-none focus:shadow-outline transition duration-150 ease-in-out"
+        <Link
+          href={`/dashboard/interview/${resolvedParams.id}/chat`}
+          className="inline-block bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-lg focus:outline-none focus:shadow-outline transition duration-150 ease-in-out"
         >
           Begin Interview
-        </button>
+        </Link>
       </div>
     </div>
   )
