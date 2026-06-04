@@ -28,7 +28,12 @@ export default function ChatClient({
     setError(null)
 
     try {
-      await saveAnswer(interviewId, currentQuestion, answer)
+      const response = await saveAnswer(interviewId, currentQuestion, answer)
+
+      if (response && response.error) {
+        setError(`Failed to save your answer: ${response.error}`)
+        return
+      }
 
       if (isLastQuestion) {
         await completeInterview(interviewId)

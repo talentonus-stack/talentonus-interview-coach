@@ -2,6 +2,7 @@
 
 import { redirect } from 'next/navigation'
 import { createClient } from '@/utils/supabase/server'
+import { generateInterviewQuestions } from './utils/questionGenerator'
 
 export async function startInterview(formData: FormData) {
   const supabase = await createClient()
@@ -48,6 +49,16 @@ export async function startInterview(formData: FormData) {
     resumeUrl = filePath
   }
 
+  // Generate dynamic questions
+  const generatedQuestions = generateInterviewQuestions({
+    industry,
+    department,
+    skills,
+    jobTitle,
+    interviewType,
+    questionCount
+  })
+
   // Insert into Supabase 'interviews' table
   const { data, error } = await supabase
     .from('interviews')
@@ -64,6 +75,7 @@ export async function startInterview(formData: FormData) {
         duration_minutes: durationMinutes,
         skills: skills,
         resume_url: resumeUrl,
+        generated_questions: generatedQuestions,
         status: 'setup',
       },
     ])

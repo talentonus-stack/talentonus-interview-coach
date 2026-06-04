@@ -10,7 +10,7 @@ export async function saveAnswer(interviewId: string, question: string, answer: 
   const { data: { user }, error: authError } = await supabase.auth.getUser()
 
   if (authError || !user) {
-    throw new Error('Unauthorized')
+    return { error: 'Unauthorized' }
   }
 
   // Insert answer into Supabase
@@ -26,9 +26,11 @@ export async function saveAnswer(interviewId: string, question: string, answer: 
 
   if (error) {
     console.error('Failed to save answer:', error)
-    // Throw the exact Supabase error message to help the frontend display it
-    throw new Error(error.message || 'An unknown error occurred while saving your answer.')
+    // Return the exact Supabase error message to help the frontend display it
+    return { error: error.message || 'An unknown error occurred while saving your answer.' }
   }
+
+  return { success: true }
 }
 
 export async function completeInterview(interviewId: string) {

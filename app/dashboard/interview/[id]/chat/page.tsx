@@ -2,30 +2,6 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/utils/supabase/server'
 import ChatClient from './ChatClient'
 
-const dummyTechnicalQuestions = [
-  "What is PHP?",
-  "Explain OOP concepts.",
-  "What is a Session in PHP?",
-  "Difference between GET and POST.",
-  "Explain MVC architecture."
-]
-
-const dummyHRQuestions = [
-  "Tell me about yourself.",
-  "Why do you want to work here?",
-  "Where do you see yourself in 5 years?",
-  "What are your greatest strengths and weaknesses?",
-  "Why should we hire you?"
-]
-
-const dummyManagerialQuestions = [
-  "Describe a time you had to manage a conflict in your team.",
-  "How do you prioritize multiple deadlines?",
-  "Tell me about a project that failed and what you learned.",
-  "How do you motivate a demotivated team member?",
-  "Explain your leadership style."
-]
-
 export default async function InterviewChatPage({
   params,
 }: {
@@ -57,20 +33,11 @@ export default async function InterviewChatPage({
     redirect('/dashboard')
   }
 
-  // Determine questions based on type
-  let baseQuestions = dummyTechnicalQuestions
-  if (interview.interview_type === 'HR Interview') baseQuestions = dummyHRQuestions
-  if (interview.interview_type === 'Managerial Interview') baseQuestions = dummyManagerialQuestions
-
-  // Generate the required number of questions by looping over the base questions
-  const requiredCount = interview.question_count || 10
-  const questions: string[] = []
-  for (let i = 0; i < requiredCount; i++) {
-    const questionText = baseQuestions[i % baseQuestions.length]
-    // Add a differentiator to repeated questions for clarity in dummy data
-    const suffix = i >= baseQuestions.length ? ` (Variation ${Math.floor(i / baseQuestions.length) + 1})` : ''
-    questions.push(`${questionText}${suffix}`)
-  }
+  // Use the dynamically generated questions stored in the database
+  const questions: string[] = interview.generated_questions || [
+    "Could you tell me a bit about yourself?",
+    "Why are you interested in this role?"
+  ]
 
   return (
     <div className="max-w-4xl mx-auto h-full flex flex-col">

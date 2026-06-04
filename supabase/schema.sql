@@ -53,7 +53,8 @@ create table interviews (
   difficulty_level text default 'Medium',
   question_count integer default 10,
   duration_minutes integer default 30,
-  resume_url text
+  resume_url text,
+  generated_questions text[] default '{}'
 );
 
 -- Set up RLS for interviews
