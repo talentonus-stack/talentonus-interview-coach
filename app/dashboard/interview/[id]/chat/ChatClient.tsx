@@ -40,7 +40,9 @@ export default function ChatClient({
       if (err instanceof Error && err.message === 'NEXT_REDIRECT') {
         throw err
       }
-      setError('Failed to save your answer. Please try again.')
+
+      const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred.'
+      setError(`Failed to save your answer: ${errorMessage}`)
     } finally {
       setIsSubmitting(false)
     }

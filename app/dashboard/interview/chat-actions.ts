@@ -26,7 +26,8 @@ export async function saveAnswer(interviewId: string, question: string, answer: 
 
   if (error) {
     console.error('Failed to save answer:', error)
-    throw new Error('Failed to save answer')
+    // Throw the exact Supabase error message to help the frontend display it
+    throw new Error(error.message || 'An unknown error occurred while saving your answer.')
   }
 }
 
