@@ -30,6 +30,9 @@ export default async function DashboardLayout({
           <Link href="/dashboard/interview/setup" className="block px-4 py-2 text-gray-600 rounded hover:bg-gray-100">
             Interview Practice
           </Link>
+          <Link href="/dashboard/history" className="block px-4 py-2 text-gray-600 rounded hover:bg-gray-100">
+            Interview History
+          </Link>
           <button className="block w-full text-left px-4 py-2 text-gray-600 rounded hover:bg-gray-100">
             Profile
           </button>

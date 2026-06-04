@@ -54,7 +54,12 @@ create table interviews (
   question_count integer default 10,
   duration_minutes integer default 30,
   resume_url text,
-  generated_questions text[] default '{}'
+  generated_questions text[] default '{}',
+  overall_score integer,
+  performance_grade text,
+  strengths text[] default '{}',
+  improvement_areas text[] default '{}',
+  recommended_learning text[] default '{}'
 );
 
 -- Set up RLS for interviews
@@ -82,7 +87,10 @@ create table interview_answers (
   interview_id uuid references public.interviews(id) on delete cascade not null,
   question text not null,
   answer text not null,
-  created_at timestamp with time zone default timezone('utc'::text, now()) not null
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null,
+  ai_feedback text,
+  recommended_answer text,
+  score integer
 );
 
 -- Set up RLS for interview_answers
