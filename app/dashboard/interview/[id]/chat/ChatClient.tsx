@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { saveAnswer, completeInterview } from '../../chat-actions'
 
 export default function ChatClient({
@@ -14,6 +15,7 @@ export default function ChatClient({
   const [answer, setAnswer] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const router = useRouter()
 
   const currentQuestion = questions[currentIndex]
   const isLastQuestion = currentIndex === questions.length - 1
@@ -36,18 +38,20 @@ export default function ChatClient({
       }
 
       if (isLastQuestion) {
-        await completeInterview(interviewId)
+        const completeResponse = await completeInterview(interviewId)
+        if (completeResponse && completeResponse.error) {
+          setError(`Analysis failed: ${completeResponse.error}`)
+          return
+        }
+
+        router.push(`/dashboard/interview/${interviewId}/summary`)
       } else {
         setAnswer('')
         setCurrentIndex((prev) => prev + 1)
       }
     } catch (err) {
-      if (err instanceof Error && err.message === 'NEXT_REDIRECT') {
-        throw err
-      }
-
       const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred.'
-      setError(`Failed to save your answer: ${errorMessage}`)
+      setError(`An unexpected error occurred: ${errorMessage}`)
     } finally {
       setIsSubmitting(false)
     }

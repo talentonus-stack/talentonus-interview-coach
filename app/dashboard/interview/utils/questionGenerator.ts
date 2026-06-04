@@ -6,7 +6,7 @@ export function generateInterviewQuestions(params: {
   interviewType: string
   questionCount: number
 }): string[] {
-  const { department, skills, jobTitle, interviewType, questionCount } = params
+  const { industry, department, skills, jobTitle, interviewType, questionCount } = params
   const questions: string[] = []
 
   // Base pool of generic HR/Behavioral/Managerial questions
@@ -66,25 +66,45 @@ export function generateInterviewQuestions(params: {
     })
   }
 
-  // 3. Fill the rest of the array with questions from the primary pool
-  let poolIndex = 0
-  while (questions.length < questionCount) {
-    // If we run out of unique questions in the primary pool, we start repeating with a variation suffix
-    const baseQuestion = primaryPool[poolIndex % primaryPool.length]
-    const variationLevel = Math.floor(poolIndex / primaryPool.length)
+  // 3. Generate situational/scenario questions tailored to the industry and department
+  questions.push(`In the ${industry} industry, particularly within ${department}, priorities can shift rapidly. Can you share an example of how you adapted to a major change?`)
 
-    if (variationLevel === 0) {
-      // Check if it's already in there to avoid exact exact duplicates if it was somehow added early
+  if (interviewType === 'Problem Solving Interview') {
+    questions.push(`Walk me through your framework for diagnosing and solving a critical issue in your current role.`)
+    questions.push(`Describe a time when you had to make a decision without having all the necessary information.`)
+  }
+
+  if (interviewType === 'Client Facing Interview' || department === 'Customer Support') {
+    questions.push(`How do you handle a situation where a client or customer is extremely dissatisfied with a deliverable?`)
+  }
+
+  // 4. Fill the rest of the array with questions from the primary pool and generated permutations
+  let poolIndex = 0
+  let generatedCounter = 0
+  while (questions.length < questionCount) {
+    // We alternate between primary pool questions and dynamically generated deep-dives
+    if (poolIndex < primaryPool.length) {
+      const baseQuestion = primaryPool[poolIndex]
       if (!questions.includes(baseQuestion)) {
         questions.push(baseQuestion)
       }
+      poolIndex++
     } else {
-       questions.push(`Follow up: ${baseQuestion} (Can you provide another example?)`)
-    }
+      generatedCounter++
+      const randomSkill = skills && skills.length > 0 ? skills[generatedCounter % skills.length] : department
 
-    poolIndex++
+      const dynamicPrompts = [
+        `How would you mentor a junior team member struggling to learn ${randomSkill}?`,
+        `Describe a scenario where your knowledge of ${randomSkill} saved a project from failure.`,
+        `What do you consider the biggest limitation of ${randomSkill}, and how do you work around it?`,
+        `If you had to design a new workflow for ${department}, how would you incorporate ${randomSkill}?`,
+        `Tell me about a time you disagreed with a colleague regarding best practices for ${randomSkill}.`
+      ]
+
+      questions.push(dynamicPrompts[generatedCounter % dynamicPrompts.length])
+    }
   }
 
-  // Return exactly the requested number of questions
+  // Return exactly the requested number of questions (in case we overfilled)
   return questions.slice(0, questionCount)
 }
