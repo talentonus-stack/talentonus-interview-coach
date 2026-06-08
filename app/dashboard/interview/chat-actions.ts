@@ -1,7 +1,62 @@
 'use server'
 
+import { redirect } from 'next/navigation'
 import { createClient } from '@/utils/supabase/server'
 import { analyzeInterview } from './utils/analyzer'
+import { generateInterviewQuestions } from './utils/questionGenerator'
+
+export async function confirmExtractedData(formData: FormData) {
+  const supabase = await createClient()
+
+  const { data: { user }, error: authError } = await supabase.auth.getUser()
+
+  if (authError || !user) {
+    redirect('/login')
+  }
+
+  const interviewId = formData.get('interviewId') as string
+  const extractedData = {
+    education: (formData.get('education') as string).split('\n').filter(Boolean),
+    skills: (formData.get('skills') as string).split('\n').filter(Boolean),
+    experience: (formData.get('experience') as string).split('\n').filter(Boolean),
+    projects: (formData.get('projects') as string).split('\n').filter(Boolean),
+    certifications: (formData.get('certifications') as string).split('\n').filter(Boolean),
+  }
+
+  // Fetch existing interview data to regenerate questions with the *updated* extracted data
+  const { data: interview } = await supabase
+    .from('interviews')
+    .select('*')
+    .eq('id', interviewId)
+    .single()
+
+  if (interview) {
+    const updatedQuestions = generateInterviewQuestions({
+      industry: interview.industry,
+      department: interview.department,
+      skills: interview.skills,
+      jobTitle: interview.job_title,
+      interviewType: interview.interview_type,
+      questionCount: interview.question_count,
+      candidateType: interview.candidate_type,
+      extractedData: extractedData
+    })
+
+    const { error } = await supabase
+      .from('interviews')
+      .update({
+        extracted_data: extractedData,
+        generated_questions: updatedQuestions
+      })
+      .eq('id', interviewId)
+
+    if (error) {
+      console.error('Failed to update extracted data and questions:', error)
+    }
+  }
+
+  redirect(`/dashboard/interview/session/${interviewId}`)
+}
 
 export async function saveAnswer(interviewId: string, question: string, answer: string) {
   const supabase = await createClient()

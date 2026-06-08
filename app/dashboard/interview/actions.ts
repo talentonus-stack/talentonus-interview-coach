@@ -18,6 +18,7 @@ export async function startInterview(formData: FormData) {
   const industry = formData.get('industry') as string
   const department = formData.get('department') as string
   const jobTitle = formData.get('jobTitle') as string
+  const candidateType = formData.get('candidateType') as string || 'Experienced'
   const experienceLevel = formData.get('experienceLevel') as string
   const interviewType = formData.get('interviewType') as string
   const difficultyLevel = formData.get('difficultyLevel') as string || 'Medium'
@@ -49,6 +50,19 @@ export async function startInterview(formData: FormData) {
     resumeUrl = filePath
   }
 
+  let extractedData = null
+
+  // If a resume was uploaded, mock an AI extraction
+  if (resumeUrl) {
+    extractedData = {
+      education: ["B.Sc. in Computer Science"],
+      skills: [...skills, "Agile", "Team Leadership"],
+      certifications: ["AWS Certified Solutions Architect"],
+      projects: ["Built a scalable e-commerce platform using Next.js and Supabase"],
+      experience: ["Senior Developer at Tech Corp (2018-2022)"]
+    }
+  }
+
   // Generate dynamic questions
   const generatedQuestions = generateInterviewQuestions({
     industry,
@@ -56,7 +70,9 @@ export async function startInterview(formData: FormData) {
     skills,
     jobTitle,
     interviewType,
-    questionCount
+    questionCount,
+    candidateType,
+    extractedData: extractedData || undefined
   })
 
   // Insert into Supabase 'interviews' table
@@ -68,6 +84,7 @@ export async function startInterview(formData: FormData) {
         industry: industry,
         department: department,
         job_title: jobTitle,
+        candidate_type: candidateType,
         experience_level: experienceLevel,
         interview_type: interviewType,
         difficulty_level: difficultyLevel,
@@ -75,6 +92,7 @@ export async function startInterview(formData: FormData) {
         duration_minutes: durationMinutes,
         skills: skills,
         resume_url: resumeUrl,
+        extracted_data: extractedData,
         generated_questions: generatedQuestions,
         status: 'setup',
       },
@@ -88,6 +106,11 @@ export async function startInterview(formData: FormData) {
     redirect(`/dashboard/interview/setup?error=${encodeURIComponent(errorMessage)}`)
   }
 
-  // Redirect to the interview session page
+  // If we extracted data from a resume, route to confirmation page first
+  if (extractedData) {
+    redirect(`/dashboard/interview/${data.id}/confirm`)
+  }
+
+  // Redirect directly to the interview session page if no resume
   redirect(`/dashboard/interview/session/${data.id}`)
 }

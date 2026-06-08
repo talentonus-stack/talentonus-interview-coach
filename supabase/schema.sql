@@ -59,7 +59,9 @@ create table interviews (
   performance_grade text,
   strengths text[] default '{}',
   improvement_areas text[] default '{}',
-  recommended_learning text[] default '{}'
+  recommended_learning text[] default '{}',
+  candidate_type text default 'Experienced',
+  extracted_data jsonb
 );
 
 -- Set up RLS for interviews

@@ -103,7 +103,23 @@ export default function SetupForm({
         />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div>
+          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="candidateType">
+            Candidate Type
+          </label>
+          <select
+            className="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+            id="candidateType"
+            name="candidateType"
+            defaultValue="Experienced"
+            required
+          >
+            <option value="Fresher">Fresher</option>
+            <option value="Experienced">Experienced</option>
+          </select>
+        </div>
+
         <div>
           <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="experienceLevel">
             Experience Level
