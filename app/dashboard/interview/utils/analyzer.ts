@@ -2,6 +2,7 @@ export interface AnswerAnalysis {
   score: number
   feedback: string
   recommendedAnswer: string
+  recruiterFeedback: string
 }
 
 export interface InterviewAnalysis {
@@ -53,7 +54,12 @@ export function analyzeInterview(
         : score >= 60
         ? "Good attempt, but could benefit from more specific examples or technical depth."
         : "Your answer was too brief or lacked clear relevance to the core concepts.",
-      recommendedAnswer: `A strong answer would directly address the core of "${qa.question}" by providing a structured response (e.g., STAR method), explicitly mentioning relevant tools like ${skills.join(', ')}, and giving a concrete example of your experience as a ${jobTitle}.`
+      recommendedAnswer: `A strong answer would directly address the core of "${qa.question}" by providing a structured response (e.g., STAR method), explicitly mentioning relevant tools like ${skills.join(', ')}, and giving a concrete example of your experience as a ${jobTitle}.`,
+      recruiterFeedback: score >= 80
+        ? "Strong communication skills and deep domain knowledge demonstrated. Recommend proceeding to the next round."
+        : score >= 60
+        ? "Acceptable baseline knowledge, but communication lacked structure. May need technical screening."
+        : "Candidate failed to answer adequately. Major red flag for this technical requirement."
     }
   })
 

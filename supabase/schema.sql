@@ -92,7 +92,8 @@ create table interview_answers (
   created_at timestamp with time zone default timezone('utc'::text, now()) not null,
   ai_feedback text,
   recommended_answer text,
-  score integer
+  score integer,
+  recruiter_feedback text
 );
 
 -- Set up RLS for interview_answers

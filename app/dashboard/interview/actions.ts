@@ -55,6 +55,9 @@ export async function startInterview(formData: FormData) {
   // If a resume was uploaded, mock an AI extraction
   if (resumeUrl) {
     extractedData = {
+      name: ["John Doe"],
+      technologies: ["Git", "Docker", "REST APIs"],
+      job_titles: ["Junior Developer", "Senior Developer"],
       education: ["B.Sc. in Computer Science"],
       skills: [...skills, "Agile", "Team Leadership"],
       certifications: ["AWS Certified Solutions Architect"],

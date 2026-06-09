@@ -45,21 +45,54 @@ export default async function ConfirmExtractionPage({
           <input type="hidden" name="interviewId" value={interview.id} />
 
           <div className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-2">Name</label>
+                <textarea
+                  name="name"
+                  defaultValue={(extracted.name || []).join('\n')}
+                  className="w-full border rounded-lg p-3 text-gray-700 focus:ring-blue-500 focus:border-blue-500"
+                  rows={1}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-2">Extracted Job Titles</label>
+                <textarea
+                  name="job_titles"
+                  defaultValue={(extracted.job_titles || []).join('\n')}
+                  className="w-full border rounded-lg p-3 text-gray-700 focus:ring-blue-500 focus:border-blue-500"
+                  rows={2}
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-2">Technologies</label>
+                <textarea
+                  name="technologies"
+                  defaultValue={(extracted.technologies || []).join('\n')}
+                  className="w-full border rounded-lg p-3 text-gray-700 focus:ring-blue-500 focus:border-blue-500"
+                  rows={3}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-2">Skills</label>
+                <textarea
+                  name="skills"
+                  defaultValue={(extracted.skills || []).join('\n')}
+                  className="w-full border rounded-lg p-3 text-gray-700 focus:ring-blue-500 focus:border-blue-500"
+                  rows={3}
+                />
+              </div>
+            </div>
+
             <div>
               <label className="block text-sm font-bold text-gray-700 mb-2">Education</label>
               <textarea
                 name="education"
                 defaultValue={(extracted.education || []).join('\n')}
-                className="w-full border rounded-lg p-3 text-gray-700 focus:ring-blue-500 focus:border-blue-500"
-                rows={3}
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2">Skills</label>
-              <textarea
-                name="skills"
-                defaultValue={(extracted.skills || []).join('\n')}
                 className="w-full border rounded-lg p-3 text-gray-700 focus:ring-blue-500 focus:border-blue-500"
                 rows={3}
               />

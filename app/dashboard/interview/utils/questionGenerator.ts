@@ -7,6 +7,9 @@ export function generateInterviewQuestions(params: {
   questionCount: number
   candidateType?: string
   extractedData?: {
+    name?: string[]
+    job_titles?: string[]
+    technologies?: string[]
     education?: string[]
     skills?: string[]
     certifications?: string[]

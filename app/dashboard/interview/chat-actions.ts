@@ -16,11 +16,14 @@ export async function confirmExtractedData(formData: FormData) {
 
   const interviewId = formData.get('interviewId') as string
   const extractedData = {
-    education: (formData.get('education') as string).split('\n').filter(Boolean),
-    skills: (formData.get('skills') as string).split('\n').filter(Boolean),
-    experience: (formData.get('experience') as string).split('\n').filter(Boolean),
-    projects: (formData.get('projects') as string).split('\n').filter(Boolean),
-    certifications: (formData.get('certifications') as string).split('\n').filter(Boolean),
+    name: (formData.get('name') as string)?.split('\n').filter(Boolean) || [],
+    job_titles: (formData.get('job_titles') as string)?.split('\n').filter(Boolean) || [],
+    technologies: (formData.get('technologies') as string)?.split('\n').filter(Boolean) || [],
+    skills: (formData.get('skills') as string)?.split('\n').filter(Boolean) || [],
+    education: (formData.get('education') as string)?.split('\n').filter(Boolean) || [],
+    experience: (formData.get('experience') as string)?.split('\n').filter(Boolean) || [],
+    projects: (formData.get('projects') as string)?.split('\n').filter(Boolean) || [],
+    certifications: (formData.get('certifications') as string)?.split('\n').filter(Boolean) || [],
   }
 
   // Fetch existing interview data to regenerate questions with the *updated* extracted data
@@ -128,6 +131,7 @@ export async function completeInterview(interviewId: string) {
             .update({
               ai_feedback: fb.feedback,
               recommended_answer: fb.recommendedAnswer,
+              recruiter_feedback: fb.recruiterFeedback,
               score: fb.score
             })
             .eq('id', answerRecord.id)
