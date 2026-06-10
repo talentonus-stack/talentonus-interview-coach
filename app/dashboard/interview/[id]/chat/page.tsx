@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/utils/supabase/server'
 import ChatClient from './ChatClient'
+import { generateDynamicFollowUp, InterviewContext } from '../../utils/dynamicQuestionGenerator'
 
 export default async function InterviewChatPage({
   params,
@@ -33,11 +34,37 @@ export default async function InterviewChatPage({
     redirect('/dashboard')
   }
 
-  // Use the dynamically generated questions stored in the database
-  const questions: string[] = interview.generated_questions || [
-    "Could you tell me a bit about yourself?",
-    "Why are you interested in this role?"
-  ]
+  // Fetch previous answers to construct conversation history
+  const { data: previousAnswers } = await supabase
+    .from('interview_answers')
+    .select('question, answer')
+    .eq('interview_id', interview.id)
+    .order('created_at', { ascending: true })
+
+  const conversationHistory: { role: 'interviewer' | 'candidate', content: string }[] = []
+  const previousQA: { question: string; answer: string }[] = []
+
+  if (previousAnswers) {
+    previousAnswers.forEach(ans => {
+      conversationHistory.push({ role: 'interviewer', content: ans.question })
+      conversationHistory.push({ role: 'candidate', content: ans.answer })
+      previousQA.push({ question: ans.question, answer: ans.answer })
+    })
+  }
+
+  // Generate the next dynamic question based on history
+  const context: InterviewContext = {
+    industry: interview.industry,
+    department: interview.department,
+    skills: interview.skills || [],
+    jobTitle: interview.job_title,
+    interviewType: interview.interview_type,
+    questionCount: interview.question_count,
+    candidateType: interview.candidate_type,
+    extractedData: interview.extracted_data
+  }
+
+  const nextQuestion = generateDynamicFollowUp(context, previousQA, previousQA.length)
 
   return (
     <div className="max-w-4xl mx-auto h-full flex flex-col">
@@ -51,7 +78,12 @@ export default async function InterviewChatPage({
       </header>
 
       <main className="flex-1">
-        <ChatClient interviewId={interview.id} questions={questions} />
+        <ChatClient
+          interviewId={interview.id}
+          initialHistory={conversationHistory}
+          initialNextQuestion={nextQuestion}
+          totalQuestions={interview.question_count}
+        />
       </main>
     </div>
   )

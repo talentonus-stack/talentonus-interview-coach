@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/utils/supabase/server'
 import { analyzeInterview } from './utils/analyzer'
 import { generateInterviewQuestions } from './utils/questionGenerator'
+import { generateDynamicFollowUp, InterviewContext } from './utils/dynamicQuestionGenerator'
 
 export async function confirmExtractedData(formData: FormData) {
   const supabase = await createClient()
@@ -61,34 +62,80 @@ export async function confirmExtractedData(formData: FormData) {
   redirect(`/dashboard/interview/session/${interviewId}`)
 }
 
-export async function saveAnswer(interviewId: string, question: string, answer: string) {
+export async function submitConversationalAnswer(interviewId: string, question: string, answer: string) {
   const supabase = await createClient()
 
-  // Verify authentication
+  // 1. Verify authentication
   const { data: { user }, error: authError } = await supabase.auth.getUser()
 
   if (authError || !user) {
     return { error: 'Unauthorized' }
   }
 
-  // Insert answer into Supabase
-  const { error } = await supabase
-    .from('interview_answers')
-    .insert([
-      {
+  // 2. Fetch the interview context
+  const { data: interview, error: interviewError } = await supabase
+    .from('interviews')
+    .select('*')
+    .eq('id', interviewId)
+    .single()
+
+  if (interviewError || !interview) {
+    return { error: 'Interview not found.' }
+  }
+
+  // 3. Save the answer
+  if (question && answer) {
+    const { error: insertError } = await supabase
+      .from('interview_answers')
+      .insert([{
         interview_id: interviewId,
         question: question,
         answer: answer,
-      },
-    ])
+      }])
 
-  if (error) {
-    console.error('Failed to save answer:', error)
-    // Return the exact Supabase error message to help the frontend display it
-    return { error: error.message || 'An unknown error occurred while saving your answer.' }
+    if (insertError) {
+      console.error('Failed to save answer:', insertError)
+      return { error: insertError.message || 'An unknown error occurred while saving your answer.' }
+    }
   }
 
-  return { success: true }
+  // 4. Fetch all answers to determine state
+  const { data: answers, error: fetchAnswersError } = await supabase
+    .from('interview_answers')
+    .select('question, answer')
+    .eq('interview_id', interviewId)
+    .order('created_at', { ascending: true })
+
+  if (fetchAnswersError) {
+    return { error: 'Failed to fetch conversation history.' }
+  }
+
+  const currentQuestionCount = answers ? answers.length : 0
+
+  // 5. Check if interview is complete
+  if (currentQuestionCount >= interview.question_count) {
+    // Return a flag indicating the UI should call completeInterview
+    return { isComplete: true }
+  }
+
+  // 6. Generate the next dynamic question
+  const context: InterviewContext = {
+    industry: interview.industry,
+    department: interview.department,
+    skills: interview.skills || [],
+    jobTitle: interview.job_title,
+    interviewType: interview.interview_type,
+    questionCount: interview.question_count,
+    candidateType: interview.candidate_type,
+    extractedData: interview.extracted_data
+  }
+
+  const nextQuestion = generateDynamicFollowUp(context, answers || [], currentQuestionCount)
+
+  // We optionally could update `generated_questions` array here in the DB to keep a running log,
+  // but since we derive the conversation from `interview_answers`, we just return it to the client.
+
+  return { nextQuestion }
 }
 
 export async function completeInterview(interviewId: string) {
