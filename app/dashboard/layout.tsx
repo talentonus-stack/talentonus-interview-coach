@@ -27,6 +27,9 @@ export default async function DashboardLayout({
           <Link href="/dashboard" className="block px-4 py-2 text-gray-700 bg-gray-200 rounded hover:bg-gray-200">
             Dashboard
           </Link>
+          <Link href="/dashboard/resume" className="block px-4 py-2 text-gray-600 rounded hover:bg-gray-100">
+            Resume Management
+          </Link>
           <Link href="/dashboard/interview/setup" className="block px-4 py-2 text-gray-600 rounded hover:bg-gray-100">
             Interview Practice
           </Link>

@@ -29,41 +29,36 @@ export async function startInterview(formData: FormData) {
   const skillsStr = formData.get('skills') as string
   const skills = skillsStr ? JSON.parse(skillsStr) : []
 
-  // Handle optional resume upload
-  let resumeUrl = null
-  const resumeFile = formData.get('resume') as File
-
-  if (resumeFile && resumeFile.size > 0) {
-    const fileExt = resumeFile.name.split('.').pop()
-    const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`
-    const filePath = `${user.id}/${fileName}`
-
-    const { error: uploadError } = await supabase.storage
-      .from('resumes')
-      .upload(filePath, resumeFile)
-
-    if (uploadError) {
-      console.error('Failed to upload resume:', uploadError)
-      redirect(`/dashboard/interview/setup?error=${encodeURIComponent('Failed to upload resume.')}`)
-    }
-
-    resumeUrl = filePath
-  }
-
   let extractedData = null
+  let finalCandidateType = candidateType
+  let finalResumeUrl = null
 
-  // If a resume was uploaded, mock an AI extraction
-  if (resumeUrl) {
+  // Check if user has a parsed resume saved in candidate_resumes
+  const { data: resumeRecord } = await supabase
+    .from('candidate_resumes')
+    .select('parsed_data, candidate_type, resume_url')
+    .eq('user_id', user.id)
+    .single()
+
+  if (resumeRecord && resumeRecord.parsed_data) {
     extractedData = {
-      name: ["John Doe"],
-      technologies: ["Git", "Docker", "REST APIs"],
-      job_titles: ["Junior Developer", "Senior Developer"],
-      education: ["B.Sc. in Computer Science"],
-      skills: [...skills, "Agile", "Team Leadership"],
-      certifications: ["AWS Certified Solutions Architect"],
-      projects: ["Built a scalable e-commerce platform using Next.js and Supabase"],
-      experience: ["Senior Developer at Tech Corp (2018-2022)"]
+      name: [resumeRecord.parsed_data.personal_information?.full_name],
+      technologies: resumeRecord.parsed_data.skills?.technical || [],
+      job_titles: [resumeRecord.parsed_data.professional_information?.current_designation],
+      education: resumeRecord.parsed_data.education?.map((e: { degree: string }) => e.degree) || [],
+      skills: [
+        ...(resumeRecord.parsed_data.skills?.technical || []),
+        ...(resumeRecord.parsed_data.skills?.functional || []),
+        ...(resumeRecord.parsed_data.skills?.soft || [])
+      ],
+      certifications: resumeRecord.parsed_data.certifications || [],
+      projects: resumeRecord.parsed_data.projects?.map((p: { name: string }) => p.name) || [],
+      experience: resumeRecord.parsed_data.professional_information?.previous_companies || []
     }
+
+    // Auto-detect fresher/experienced from the saved resume if available
+    finalCandidateType = resumeRecord.candidate_type || candidateType
+    finalResumeUrl = resumeRecord.resume_url
   }
 
   // Generate dynamic questions
@@ -74,7 +69,7 @@ export async function startInterview(formData: FormData) {
     jobTitle,
     interviewType,
     questionCount,
-    candidateType,
+    candidateType: finalCandidateType,
     extractedData: extractedData || undefined
   })
 
@@ -87,14 +82,14 @@ export async function startInterview(formData: FormData) {
         industry: industry,
         department: department,
         job_title: jobTitle,
-        candidate_type: candidateType,
+        candidate_type: finalCandidateType,
         experience_level: experienceLevel,
         interview_type: interviewType,
         difficulty_level: difficultyLevel,
         question_count: questionCount,
         duration_minutes: durationMinutes,
         skills: skills,
-        resume_url: resumeUrl,
+        resume_url: finalResumeUrl,
         extracted_data: extractedData,
         generated_questions: generatedQuestions,
         status: 'setup',

@@ -76,86 +76,99 @@ export function generateInterviewQuestions(params: {
     primaryPool = technicalQuestions
   }
 
-  // 1. Always start with a relevant opening question based on candidate type
+  const allSkills = Array.from(new Set([...skills, ...(extractedData?.skills || []), ...(extractedData?.technologies || [])]))
+
+  // Calculate distribution targets based on Candidate Type 40/20/20/20 Rule
+  const expTarget = Math.max(1, Math.round(questionCount * 0.4))
+  const projTarget = Math.max(1, Math.round(questionCount * 0.2))
+  const skillTarget = Math.max(1, Math.round(questionCount * 0.2))
+  // Behavioral fills the remainder
+
+  let generatedExp = 0
+  let generatedProj = 0
+  let generatedSkill = 0
+
+  // 1. Opening Question (Counts towards Experience/Academic)
   if (candidateType === 'Fresher') {
-    questions.push(`Could you start by telling me a bit about your academic background and why you are interested in starting your career as a ${jobTitle}?`)
+    questions.push(`Could you start by telling me about your academic background and why you are interested in starting your career as a ${jobTitle}?`)
+    generatedExp++
   } else {
     questions.push(`Could you start by walking me through your recent experience as a ${jobTitle}?`)
+    generatedExp++
   }
 
-  // 2. Incorporate Extracted Resume Data (if available)
+  // 2. Experience / Academic Questions (40%)
   if (extractedData) {
     if (candidateType === 'Fresher' && extractedData.education && extractedData.education.length > 0) {
-      questions.push(`I see you studied ${extractedData.education[0]}. How has your coursework prepared you for the ${department} department in the ${industry} industry?`)
-    }
-
-    if (extractedData.projects && extractedData.projects.length > 0) {
-      questions.push(`Your resume mentions the project: "${extractedData.projects[0]}". Can you explain your specific role and the challenges you overcame during this project?`)
+      while (generatedExp < expTarget) {
+        questions.push(`I see you studied ${extractedData.education[0]}. How has your coursework prepared you for the ${department} department in the ${industry} industry?`)
+        generatedExp++
+      }
     }
 
     if (candidateType === 'Experienced' && extractedData.experience && extractedData.experience.length > 0) {
-      questions.push(`You mentioned your experience at ${extractedData.experience[0]}. What was your biggest achievement there?`)
-      questions.push(`In your previous role, how did you handle a significant setback or failure?`)
+      const expList = extractedData.experience
+      while (generatedExp < expTarget) {
+        questions.push(`You mentioned your experience at ${expList[generatedExp % expList.length]}. Can you elaborate on your primary responsibilities and achievements there?`)
+        generatedExp++
+      }
     }
   }
 
-  // 3. Generate Skill-based questions if skills are provided
-  // Merge manually selected skills with extracted skills
-  const allSkills = Array.from(new Set([...skills, ...(extractedData?.skills || [])]))
+  // Fill remaining Experience quota if resume data is missing
+  while (generatedExp < expTarget) {
+    questions.push(candidateType === 'Fresher'
+      ? `What was the most challenging academic assignment you've completed related to ${department}?`
+      : `Describe a time in your past experience when you had to adapt quickly to a major change in a ${department} role.`)
+    generatedExp++
+  }
 
+  // 3. Project Questions (20%)
+  if (extractedData && extractedData.projects && extractedData.projects.length > 0) {
+    const projList = extractedData.projects
+    while (generatedProj < projTarget) {
+      questions.push(`Your resume mentions the project: "${projList[generatedProj % projList.length]}". Can you explain your specific role and the challenges you overcame?`)
+      generatedProj++
+    }
+  }
+
+  // Fill remaining Project quota
+  while (generatedProj < projTarget) {
+    questions.push(candidateType === 'Fresher'
+      ? `Explain a final year or academic project you are most proud of.`
+      : `Walk me through a complex project you recently delivered. What was the outcome?`)
+    generatedProj++
+  }
+
+  // 4. Skill Questions (20%)
   if (allSkills.length > 0) {
-    allSkills.slice(0, 5).forEach(skill => { // Limit to top 5 to avoid filling the whole interview with just skill questions
-      if (candidateType === 'Fresher') {
-        questions.push(`Can you explain your theoretical understanding or academic experience working with ${skill}?`)
-      } else {
-        questions.push(`Can you provide a concrete example of a complex problem you solved using ${skill}?`)
-      }
-    })
-  }
-
-  // 4. Generate situational/scenario questions tailored to the industry and department
-  if (candidateType === 'Fresher') {
-    questions.push(`As someone entering the ${industry} industry, what do you think is the biggest learning curve for a new ${jobTitle}?`)
-  } else {
-    questions.push(`In the ${industry} industry, particularly within ${department}, priorities can shift rapidly. Can you share an example of how you adapted to a major change?`)
-  }
-
-  if (interviewType === 'Problem Solving Interview') {
-    questions.push(`Walk me through your framework for diagnosing and solving a critical issue in your current role.`)
-    questions.push(`Describe a time when you had to make a decision without having all the necessary information.`)
-  }
-
-  if (interviewType === 'Client Facing Interview' || department === 'Customer Support') {
-    questions.push(`How do you handle a situation where a client or customer is extremely dissatisfied with a deliverable?`)
-  }
-
-  // 5. Fill the rest of the array with questions from the primary pool and generated permutations
-  let poolIndex = 0
-  let generatedCounter = 0
-  while (questions.length < questionCount) {
-    // We alternate between primary pool questions and dynamically generated deep-dives
-    if (poolIndex < primaryPool.length) {
-      const baseQuestion = primaryPool[poolIndex]
-      if (!questions.includes(baseQuestion)) {
-        questions.push(baseQuestion)
-      }
-      poolIndex++
-    } else {
-      generatedCounter++
-      const randomSkill = skills && skills.length > 0 ? skills[generatedCounter % skills.length] : department
-
-      const dynamicPrompts = [
-        `How would you mentor a junior team member struggling to learn ${randomSkill}?`,
-        `Describe a scenario where your knowledge of ${randomSkill} saved a project from failure.`,
-        `What do you consider the biggest limitation of ${randomSkill}, and how do you work around it?`,
-        `If you had to design a new workflow for ${department}, how would you incorporate ${randomSkill}?`,
-        `Tell me about a time you disagreed with a colleague regarding best practices for ${randomSkill}.`
-      ]
-
-      questions.push(dynamicPrompts[generatedCounter % dynamicPrompts.length])
+    while (generatedSkill < skillTarget) {
+      const skill = allSkills[generatedSkill % allSkills.length]
+      questions.push(candidateType === 'Fresher'
+        ? `Can you explain your theoretical understanding or academic experience working with ${skill}?`
+        : `Can you provide a concrete example of a complex problem you solved using ${skill}?`)
+      generatedSkill++
     }
   }
 
-  // Return exactly the requested number of questions (in case we overfilled)
+  // Fill remaining Skill quota
+  while (generatedSkill < skillTarget) {
+    questions.push(`What core skills do you believe are most critical for a ${jobTitle} in the ${industry} industry?`)
+    generatedSkill++
+  }
+
+  // 5. Behavioral / Managerial / Primary Pool Questions (20% - Remainder)
+  let poolIndex = 0
+  while (questions.length < questionCount) {
+    const baseQuestion = primaryPool[poolIndex % primaryPool.length]
+    if (!questions.includes(baseQuestion)) {
+      questions.push(baseQuestion)
+    } else {
+      questions.push(`Follow up: ${baseQuestion} (Could you provide a different example?)`)
+    }
+    poolIndex++
+  }
+
+  // Return exactly the requested number of questions
   return questions.slice(0, questionCount)
 }

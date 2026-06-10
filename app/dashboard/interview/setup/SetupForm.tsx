@@ -247,20 +247,6 @@ export default function SetupForm({
         </div>
       </div>
 
-      <div>
-        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="resume">
-          Resume Upload (Optional)
-        </label>
-        <input
-          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-          id="resume"
-          name="resume"
-          type="file"
-          accept=".pdf,.docx"
-        />
-        <p className="text-xs text-gray-500 mt-1">Accepts PDF and DOCX files.</p>
-      </div>
-
       <div className="flex items-center justify-end mt-8">
         <button
           type="submit"
